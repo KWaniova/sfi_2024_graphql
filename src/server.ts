@@ -1,38 +1,17 @@
+import "reflect-metadata";
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from '@apollo/server/standalone';
+import { buildSchema } from "type-graphql";
+import FilmResolver from "./resolvers/film.resolver";
+import CharacterResolver from "./resolvers/character.resolver";
 
-const typeDefs = `#graphql
-    type File {
-        title: String!
-        director: String!
-    }
-
-    type Query {
-        files: [File]
-    }
-    `;
-
-const files = [
-    {
-        title: 'The Shawshank Redemption',
-        director: 'Frank Darabont'
-    },
-    {
-        title: 'The Godfather',
-        director: 'Francis Ford Coppola'
-    }
-];
-
-controlers w REST - przekazują dane dalej
-
-const resolvers = {
-    Query: {
-        files: () => files
-    }
-};
 
 export const listen = async (port: number) => {
-    const server = new ApolloServer({ typeDefs, resolvers });
+    const schema = await buildSchema({
+        resolvers: [FilmResolver, CharacterResolver],
+
+    });
+    const server = new ApolloServer({ schema });
     const { url } = await startStandaloneServer(server, {
         listen: {
             port: port,

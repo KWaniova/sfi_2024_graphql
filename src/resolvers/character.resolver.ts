@@ -1,7 +1,7 @@
 import { Query } from "type-graphql";
-import { GenderEnum } from "../schema/character.schema";
+import Character, { GenderEnum } from "../schema/character.schema";
 
-class Character {
+class CharacterResolver {
     @Query(() => [Character])
     characters() {
         return [
@@ -19,4 +19,4 @@ class Character {
     }
 }
 
-export default Character;
+export default CharacterResolver;
