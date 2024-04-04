@@ -1,9 +1,20 @@
 import axios from "axios";
 import Film from "../schema/film.schema";
 import Character from "../schema/character.schema";
+import DataLoader from "dataloader";
 
 class StarWarsService {
   private readonly baseUrl = "https://swapi.dev/api";
+
+  private batchCharacters = new DataLoader(
+    async (ids: number[]) => {
+      const characters = await Promise.all(
+        ids.map(async (id) => (await axios.get(`${this.baseUrl}/people/${id}`)).data)
+      );
+      const mappedCharacters = characters.map(this.characterMapper);
+      return mappedCharacters;
+    }
+  );
 
   private filmMapper(film: any): Film {
     return {
@@ -41,8 +52,9 @@ class StarWarsService {
   }
 
   async getCharacter(id: number) {
-    const result = (await axios.get(`${this.baseUrl}/people/${id}`)).data;
-    return this.characterMapper(result);
+    return (await this.batchCharacters.load(id) as Character);
+    // const result = (await axios.get(`${this.baseUrl}/people/${id}`)).data;
+    // return this.characterMapper(result);
   }
 
   async getFilm(id: number) {
